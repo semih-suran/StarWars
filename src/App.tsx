@@ -31,7 +31,7 @@ function App() {
               <ResourceList
                 resourceKey="people"
                 fetchFn={fetchPeople}
-                renderCard={(person) => <PersonCard person={person} />}
+                renderCard={(person) => <PersonCard person={person as any} />}
               />
             }
           />
@@ -42,7 +42,7 @@ function App() {
               <ResourceList
                 resourceKey="planets"
                 fetchFn={fetchPlanets}
-                renderCard={(planet) => <PlanetCard data={planet} />}
+                renderCard={(planet) => <PlanetCard data={planet as any} />}
               />
             }
           />
@@ -53,7 +53,7 @@ function App() {
               <ResourceList
                 resourceKey="starships"
                 fetchFn={fetchStarships}
-                renderCard={(ship) => <StarshipCard data={ship} />}
+                renderCard={(ship) => <StarshipCard data={ship as any} />}
               />
             }
           />
@@ -64,7 +64,7 @@ function App() {
               <ResourceList
                 resourceKey="vehicles"
                 fetchFn={fetchVehicles}
-                renderCard={(vehicle) => <VehicleCard data={vehicle} />}
+                renderCard={(vehicle) => <VehicleCard data={vehicle as any} />}
               />
             }
           />
@@ -75,7 +75,7 @@ function App() {
               <ResourceList
                 resourceKey="species"
                 fetchFn={fetchSpecies}
-                renderCard={(specie) => <SpeciesCard data={specie} />}
+                renderCard={(specie) => <SpeciesCard data={specie as any} />}
               />
             }
           />

@@ -93,7 +93,7 @@ export const DetailView: React.FC<Props> = ({ resource, url }) => {
 
   const skipKeys = new Set(["url", "created", "edited"]);
 
-  const renderValue = (k: string, v: any) => {
+  const renderValue = (_k: string, v: any) => {
     if (v == null || v === "") return <span className="text-gray-400">—</span>;
     if (Array.isArray(v)) {
       if (v.length === 0) return <span className="text-gray-400">—</span>;
