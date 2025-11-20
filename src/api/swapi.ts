@@ -1,5 +1,12 @@
 import axios from "axios";
-import type { APIResponse } from "../types";
+import type {
+  APIResponse,
+  Person,
+  Planet,
+  Species,
+  Starship,
+  Vehicle,
+} from "../types";
 
 const api = axios.create({
   baseURL: "https://swapi.dev/api/",
@@ -13,23 +20,23 @@ export const fetchList = async <T>(
 ): Promise<APIResponse<T>> => {
   const params: Record<string, string | number> = { page };
   if (search) params.search = search;
-  const { data } = await api.get(endpoint, { params });
+  const { data } = await api.get<APIResponse<T>>(endpoint, { params });
   return data;
 };
 
 export const fetchPeople = (page = 1, search = "") =>
-  fetchList("people/", page, search);
+  fetchList<Person>("people/", page, search);
 export const fetchPlanets = (page = 1, search = "") =>
-  fetchList("planets/", page, search);
+  fetchList<Planet>("planets/", page, search);
 export const fetchSpecies = (page = 1, search = "") =>
-  fetchList("species/", page, search);
+  fetchList<Species>("species/", page, search);
 export const fetchStarships = (page = 1, search = "") =>
-  fetchList("starships/", page, search);
+  fetchList<Starship>("starships/", page, search);
 export const fetchVehicles = (page = 1, search = "") =>
-  fetchList("vehicles/", page, search);
+  fetchList<Vehicle>("vehicles/", page, search);
 
 export const fetchByUrl = async <T>(url: string): Promise<T> => {
-  const { data } = await axios.get(url, { timeout: 10000 });
+  const { data } = await axios.get<T>(url, { timeout: 10000 });
   return data;
 };
 
@@ -49,13 +56,18 @@ export const fetchAllPages = async <T>(
   return results;
 };
 
-export const fetchMultipleByUrls = async <T>(urls: string[]): Promise<T[]> => {
-  const requests = urls.map((url) =>
+export const fetchMultipleByUrls = async <T = unknown>(
+  urls: string[]
+): Promise<T[]> => {
+  const requests: Promise<T | null>[] = urls.map((url) =>
     axios
       .get<T>(url, { timeout: 10000 })
       .then((r) => r.data)
       .catch(() => null)
   );
-  const results = await Promise.all(requests);
-  return results.filter((r): r is T => r !== null);
+
+  const results = (await Promise.all(requests)) as (T | null)[];
+  const filtered = results.filter((r): r is T => r != null);
+
+  return filtered;
 };

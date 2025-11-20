@@ -26,3 +26,5 @@ dist-ssr
 # Self Notes
 
 *.selfnote.md
+# Local Netlify folder
+.netlify

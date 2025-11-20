@@ -9,6 +9,7 @@ import {
   fetchStarships,
   fetchVehicles,
 } from "../../api/swapi";
+import { useModalStore } from "../../store/useModalStore";
 
 import { PersonCard } from "../../components/cards/PersonCard";
 import { PlanetCard } from "../../components/cards/PlanetCard";
@@ -22,6 +23,46 @@ type GlobalResults = {
   starships: any[];
   vehicles: any[];
   species: any[];
+};
+
+const ClickableWrapper: React.FC<{
+  resourceKey: string;
+  item: any;
+  children: React.ReactNode;
+}> = ({ resourceKey, item, children }) => {
+  const openModal = useModalStore((s) => s.openModal);
+  const hasUrl = !!item?.url;
+
+  const onActivate = () => {
+    if (!hasUrl) return;
+    openModal(resourceKey, item.url);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (!hasUrl) return;
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      onActivate();
+    }
+  };
+
+  return (
+    <div
+      role={hasUrl ? "button" : undefined}
+      tabIndex={hasUrl ? 0 : -1}
+      aria-disabled={!hasUrl}
+      onClick={onActivate}
+      onKeyDown={onKeyDown}
+      className={`cursor-pointer focus:outline-none focus:ring-2 focus:ring-sw-yellow rounded ${
+        hasUrl ? "hover:shadow-lg" : "opacity-80 cursor-default"
+      }`}
+      aria-label={
+        hasUrl ? `Open ${item?.name ?? item?.title} details` : undefined
+      }
+    >
+      {children}
+    </div>
+  );
 };
 
 export const GlobalSearchResults: React.FC = () => {
@@ -149,7 +190,9 @@ export const GlobalSearchResults: React.FC = () => {
           <div className={gridClass}>
             {results.people.map((p) => (
               <div key={p.url ?? p.name}>
-                <PersonCard person={p} />
+                <ClickableWrapper resourceKey="people" item={p}>
+                  <PersonCard person={p} />
+                </ClickableWrapper>
               </div>
             ))}
           </div>
@@ -164,7 +207,9 @@ export const GlobalSearchResults: React.FC = () => {
           <div className={gridClass}>
             {results.planets.map((p) => (
               <div key={p.url ?? p.name}>
-                <PlanetCard data={p} />
+                <ClickableWrapper resourceKey="planets" item={p}>
+                  <PlanetCard data={p} />
+                </ClickableWrapper>
               </div>
             ))}
           </div>
@@ -179,7 +224,9 @@ export const GlobalSearchResults: React.FC = () => {
           <div className={gridClass}>
             {results.starships.map((p) => (
               <div key={p.url ?? p.name}>
-                <StarshipCard data={p} />
+                <ClickableWrapper resourceKey="starships" item={p}>
+                  <StarshipCard data={p} />
+                </ClickableWrapper>
               </div>
             ))}
           </div>
@@ -194,7 +241,9 @@ export const GlobalSearchResults: React.FC = () => {
           <div className={gridClass}>
             {results.vehicles.map((p) => (
               <div key={p.url ?? p.name}>
-                <VehicleCard data={p} />
+                <ClickableWrapper resourceKey="vehicles" item={p}>
+                  <VehicleCard data={p} />
+                </ClickableWrapper>
               </div>
             ))}
           </div>
@@ -209,7 +258,9 @@ export const GlobalSearchResults: React.FC = () => {
           <div className={gridClass}>
             {results.species.map((p) => (
               <div key={p.url ?? p.name}>
-                <SpeciesCard data={p} />
+                <ClickableWrapper resourceKey="species" item={p}>
+                  <SpeciesCard data={p} />
+                </ClickableWrapper>
               </div>
             ))}
           </div>
