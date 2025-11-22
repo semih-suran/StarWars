@@ -1,106 +1,78 @@
-# SWAPI Reborn
+# SWAPI REBORN
 
-A small React + TypeScript project that lists Star Wars resources from the official SWAPI and shows details with safe images (where available). Built with Vite, Tailwind, Zustand, and lightly tested via Vitest + Testing Library.
+A responsive, interactive React application that allows users to explore the Star Wars universe via the SWAPI. Built with a focus on clean architecture, type safety, and robust error handling.
 
-This README explains how the project is organised, how to work locally, recommended fixes and cleanups, and testing/linting workflows.
+**Live Demo:** [[Netlify](https://starwars-semih.netlify.app/)]
 
----
+## 🛠 Tech Stack & Tools
 
-## Quick start
+- **Core:** React 18, TypeScript, Vite
+- **State Management:** Zustand (Global), React Hooks (Local)
+- **Styling:** Tailwind CSS
+- **Data Fetching:** Axios + Custom Hooks (with AbortController)
+- **Testing:** Vitest, React Testing Library
 
-### 1. install dependencies
+## 🏗 Architectural Decisions
 
-`npm install`
+### 1. Hybrid State Management
+I chose a hybrid approach to state management to keep the application lightweight but scalable:
+- **Zustand:** Used for truly global concerns that need to persist across routes (e.g., `usePaginationStore` for preserving page state per resource, `useModalStore` for UI overlays).
+- **Local State:** Used for ephemeral UI data (e.g., loading spinners, form inputs) to avoid unnecessary global complexity.
 
-### 2. run dev server
+### 2. Custom Data Fetching Hook (`useResource`)
+Instead of reaching for a heavy library like TanStack Query immediately, I implemented a custom `useResource` hook to demonstrate understanding of asynchronous patterns.
+- **Race Condition Handling:** Implements `AbortController` to cancel stale requests when navigating rapidly between pages.
+- **Caching:** Features a simple in-memory `Map` cache to prevent redundant network requests for recently visited pages.
+- **Error Handling:** Graceful fallbacks for network errors and empty states.
 
-`npm run dev`
+### 3. Component Composition
+The UI is built using small, single-purpose components (e.g., `Thumbnail`, `swapi.ts` API layer). The `DetailView` uses `Promise.all` to fetch related resources (Films, Homeworld) in parallel, preventing "waterfall" loading states.
 
-### 3. open http://localhost:5173
+## ⚖️ Trade-offs & Known Limitations
 
-## Features
+In a production environment, I would address the following trade-offs made for this technical assessment:
 
-- React + TypeScript
-- Global state management with Zustand
-- Async data fetching with SWAPI
-- UI cards for People, Planets, Starships, Vehicles, and Species
-- Lazy‑loaded DetailView modal
-- Accessible keyboard‑close modals (Escape + backdrop)
-- Global search with store persistence
-- Image rendering via SWAPI companion images
-- Tested with React Testing Library + Vitest
+1.  **Caching Strategy:** The current in-memory cache is simple but lacks invalidation logic (TTL) or persistence. For a larger app, I would migrate to **TanStack Query** to handle stale-while-revalidate, window focus refetching, and rigorous cache invalidation.
+2.  **Global Search:** The Global Search feature performs a recursive fetch of all pages (`fetchAllPages`). While effective for this specific API (which lacks deep search), this is resource-intensive. In production, this should be offloaded to a backend search index (e.g., Elasticsearch).
+3.  **Image Assets:** SWAPI does not provide images. I am using a third-party provider with fallback logic. In a real product, these assets would be hosted on a dedicated CDN.
 
-## Requirements
+## 🚀 Quick Start
 
-- Node 18+
-- npm
-
-## Scripts
-
-- `npm run dev` --- start Vite dev server\
-- `npm run build` --- production build\
-- `npm run preview` --- preview production build\
-- `npm run test` --- run tests
-
-## Project Structure
-
-src/
-api/
-swapi.ts # central API layer for SWAPI requests
-components/
-cards/ # card components for each resource
-PersonCard.tsx
-PlanetCard.tsx
-StarshipCard.tsx
-VehicleCard.tsx
-SpeciesCard.tsx
-layout/
-Layout.tsx
-ui/
-Thumbnail.tsx
-SwapiImage.tsx
-ResourceList.tsx
-Modal.tsx
-DetailView.tsx
-Loading.tsx
-ErrorState.tsx
-Pagination.tsx
-hooks/
-useResource.ts # reusable paginated fetcher hook
-store/
-useSearchStore.ts
-usePaginationStore.ts
-useModalStore.ts
-types/
-index.ts
-utils/
-imageProvider.ts
-test/
-setup.ts # vitest setup for testing-library
-main.tsx
-App.tsx
-
-## State Management (Zustand)
-
-- `useSearchStore` controls global search\
-- `useModalStore` manages modal visibility and resource info
-
-## Testing
-
-Tests use: - React Testing Library - @testing-library/jest-dom - Vitest
-test runner
-
-Run:
-
+### 1. Install dependencies
+```
+npm install
+```
+### 2. Run development server
+```
+npm run dev
+```
+### 2. Run tests
 ```
 npm run test
 ```
+## 📂 Project Structure
+```
+src/
+├── api/            # Centralized Axios instances & endpoints
+├── components/     #
+│   ├── cards/      # Domain-specific cards (Person, Planet, etc.)
+│   ├── ui/         # Reusable UI primitives (Modal, Pagination, Loading)
+│   └── layout/     # Global layout wrappers
+├── features/       # Feature-specific logic (Search, Lists)
+├── hooks/          # Custom hooks (useResource, usePeople)
+├── store/          # Zustand stores
+├── types/          # TypeScript definitions
+└── utils/          # Helpers (Image mapping, formatting)
+```
+## ✅ Key Features
 
-## Development Notes
+- **Type Safety:** Full TypeScript coverage for API responses and Props.
 
-- Cards use `SwapiImage` for standardised images\
-- Modal uses a portal + Escape handler\
-- DetailView loads on demand
+- **Accessibility:** Modals manage focus and support `Escape` key closure.
+
+- **Performance:** Lazy-loaded modals and parallel data fetching.
+
+- **Robustness:** Handles API errors and "race conditions" during rapid navigation.
 
 ## License
 
